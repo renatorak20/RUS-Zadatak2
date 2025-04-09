@@ -1,118 +1,118 @@
 /**
  * @file sleep_wakeup_example.ino
  *
- * @mainpage Sleep & Wake-Up System with LED and Button
+ * @mainpage Sustav za Uspavljivanje i Buđenje s LED diodom i Tipkalom
  *
- * @section description Description
- * This Arduino project demonstrates energy-saving techniques using sleep modes.
- * An LED blinks for 5 seconds, and the system then enters a low-power sleep mode.
- * It can be woken up either by a button press (external interrupt) or after a timed interval
- * using the Watchdog Timer interrupt (~4 seconds).
+ * @section description Opis
+ * Ovaj Arduino projekt demonstrira tehnike uštede energije korištenjem sleep modova.
+ * LED dioda svijetli 5 sekundi, nakon čega sustav prelazi u način niske potrošnje (sleep).
+ * Mikrokontroler se može probuditi pritiskom na tipkalo (vanjski prekid) ili nakon određenog vremena
+ * pomoću Watchdog Timer prekida (~4 sekunde).
  *
- * @section hardware Hardware Setup
- * - LED connected to pin 13.
- * - Button connected to pin 2 (used with external interrupt INT0).
+ * @section hardware Hardverska postava
+ * - LED dioda spojena na pin 13.
+ * - Tipkalo spojeno na pin 2 (koristi vanjski prekid INT0).
  *
- * @section libraries Libraries
- * - AVR Sleep Library
- * - AVR Watchdog Timer Library
- * - AVR Interrupt Library
+ * @section libraries Korištene biblioteke
+ * - AVR biblioteka za Sleep modove
+ * - AVR biblioteka za Watchdog Timer
+ * - AVR biblioteka za prekide
  *
- * @section notes Notes
- * - The button uses the internal pull-up resistor and triggers on the falling edge.
- * - The Watchdog Timer is configured to wake the device approximately every 4 seconds.
+ * @section notes Napomene
+ * - Tipkalo koristi internu pull-up otpornicu i aktivira se na silazni brid signala (falling edge).
+ * - Watchdog Timer je konfiguriran da probudi uređaj otprilike svakih 4 sekunde.
  *
- * @section author Author
- * - Created by Renato Rak on 08/04/2025.
+ * @section author Autor
+ * - Autor: Renato Rak, 08/04/2025.
  */
 
-// Libraries
-#include <avr/sleep.h>     ///< Library for sleep modes.
-#include <avr/wdt.h>       ///< Library for Watchdog Timer control.
-#include <avr/interrupt.h> ///< Library for interrupt handling.
+// Biblioteke
+#include <avr/sleep.h>     ///< Biblioteka za upravljanje sleep modovima.
+#include <avr/wdt.h>       ///< Biblioteka za upravljanje Watchdog Timerom.
+#include <avr/interrupt.h> ///< Biblioteka za rukovanje prekidima.
 
-// Pin definitions
-const int ledPin = 13;     ///< Pin connected to the LED.
-const int buttonPin = 2;   ///< Pin connected to the button (INT0).
+// Definicija pinova
+const int ledPin = 13;     ///< Pin na koji je spojena LED dioda.
+const int buttonPin = 2;   ///< Pin na koji je spojeno tipkalo (INT0).
 
-volatile bool isSleeping = true; ///< Flag to determine sleep/wake state.
+volatile bool isSleeping = true; ///< Zastavica koja označava stanje spavanja/buđenja.
 
 /**
- * @brief External interrupt service routine for button press.
- * This ISR is triggered when the button is pressed (falling edge),
- * and it sets the flag to wake the device.
+ * @brief ISR za vanjski prekid pritiska tipkala.
+ * Ova funkcija se aktivira kada korisnik pritisne tipkalo (falling edge),
+ * i postavlja zastavicu za buđenje mikrokontrolera.
  */
 void buttonWakeUp() {
     isSleeping = false;
 }
 
 /**
- * @brief Watchdog Timer interrupt service routine.
- * This ISR is triggered automatically after ~4 seconds,
- * and it sets the flag to wake the device.
+ * @brief ISR za prekid Watchdog Timera.
+ * Ova funkcija se aktivira automatski nakon ~4 sekunde,
+ * i postavlja zastavicu za buđenje mikrokontrolera.
  */
 ISR(WDT_vect) {
     isSleeping = false;
 }
 
 /**
- * @brief Arduino setup function.
- * Initializes serial communication, sets pin modes, configures external interrupt,
- * and sets the microcontroller to use the power-down sleep mode.
+ * @brief Inicijalna funkcija postavljanja.
+ * Pokreće serijsku komunikaciju, postavlja ulazno/izlazne pinove,
+ * konfigurira vanjski prekid i odabire sleep mod.
  */
 void setup() {
-    Serial.begin(9600); ///< Initialize serial communication.
+    Serial.begin(9600); ///< Pokretanje serijske komunikacije.
 
-    pinMode(ledPin, OUTPUT);      ///< Set LED pin as output.
-    pinMode(buttonPin, INPUT);    ///< Set button pin as input (can be combined with pull-up if needed).
+    pinMode(ledPin, OUTPUT);      ///< Postavi LED pin kao izlaz.
+    pinMode(buttonPin, INPUT);    ///< Postavi pin za tipkalo kao ulaz (može se koristiti s pull-up otpornikom).
 
-    attachInterrupt(digitalPinToInterrupt(buttonPin), buttonWakeUp, FALLING); ///< Configure external interrupt on falling edge.
-    set_sleep_mode(SLEEP_MODE_PWR_DOWN); ///< Set the sleep mode to power-down for minimal power consumption.
+    attachInterrupt(digitalPinToInterrupt(buttonPin), buttonWakeUp, FALLING); ///< Konfiguracija vanjskog prekida na silazni brid.
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN); ///< Postavi sleep mod na Power-down za minimalnu potrošnju.
 }
 
 /**
- * @brief Arduino main loop function.
- * Blinks an LED for 5 seconds, then enters sleep mode.
- * Wakes up on either button press or Watchdog Timer interrupt.
+ * @brief Glavna petlja programa.
+ * LED svijetli 5 sekundi, zatim mikrokontroler prelazi u sleep mod.
+ * Buđenje se odvija pomoću tipkala ili Watchdog Timera.
  */
 void loop() {
-    digitalWrite(ledPin, HIGH); ///< Turn on LED.
-    delay(5000);                ///< Wait for 5 seconds.
-    digitalWrite(ledPin, LOW);  ///< Turn off LED.
+    digitalWrite(ledPin, HIGH); ///< Uključi LED.
+    delay(5000);                ///< Pričekaj 5 sekundi.
+    digitalWrite(ledPin, LOW);  ///< Isključi LED.
 
-    Serial.println("*Entering sleep mode*");
-    configureWatchdog(); ///< Configure Watchdog Timer before sleep.
-    enterSleep();        ///< Enter sleep mode and wait for wake-up signal.
+    Serial.println("*Ulazim u sleep mod*");
+    configureWatchdog(); ///< Konfiguriraj Watchdog Timer prije spavanja.
+    enterSleep();        ///< Uđi u sleep mod i čekaj prekid.
 
-    Serial.println("I've woken up!");
+    Serial.println("Probudili smo se!");
 }
 
 /**
- * @brief Puts the microcontroller into sleep mode until an interrupt occurs.
+ * @brief Funkcija za ulazak u sleep mod do sljedećeg prekida.
  */
 void enterSleep() {
-    noInterrupts();          ///< Disable interrupts to prepare for sleep.
-    isSleeping = true;       ///< Reset the sleeping flag.
+    noInterrupts();          ///< Onemogući prekide prije ulaska u sleep.
+    isSleeping = true;       ///< Resetiraj zastavicu spavanja.
 
-    sleep_enable();          ///< Enable sleep mode.
-    interrupts();            ///< Re-enable interrupts before sleeping.
-    sleep_cpu();             ///< Put the CPU to sleep.
+    sleep_enable();          ///< Omogući sleep mod.
+    interrupts();            ///< Ponovno omogući prekide.
+    sleep_cpu();             ///< Uspavaj CPU.
 
-    while (isSleeping) {}    ///< Wait here until an interrupt occurs.
+    while (isSleeping) {}    ///< Ostani u petlji dok se ne dogodi prekid.
 
-    sleep_disable();         ///< Disable sleep after waking up.
+    sleep_disable();         ///< Onemogući sleep nakon buđenja.
 }
 
 /**
- * @brief Configures the Watchdog Timer to trigger an interrupt after ~4 seconds.
+ * @brief Konfigurira Watchdog Timer da generira prekid nakon otprilike 4 sekunde.
  */
 void configureWatchdog() {
-    cli();           ///< Disable interrupts.
-    wdt_reset();     ///< Reset Watchdog Timer.
+    cli();           ///< Onemogući sve prekide.
+    wdt_reset();     ///< Resetiraj Watchdog Timer.
 
-    // Set WDT for ~4 seconds (WDP3 bit)
-    WDTCSR = (1 << WDCE) | (1 << WDE);               ///< Enable configuration changes.
-    WDTCSR = (1 << WDIE) | (1 << WDP3);              ///< Enable interrupt mode with 4s timeout.
+    // Postavi WDT na ~4 sekunde (WDP3 bit)
+    WDTCSR = (1 << WDCE) | (1 << WDE);               ///< Omogući promjene postavki.
+    WDTCSR = (1 << WDIE) | (1 << WDP3);              ///< Omogući interrupt mod s timeoutom od 4 sekunde.
 
-    sei();           ///< Re-enable interrupts.
+    sei();           ///< Ponovno omogući prekide.
 }
