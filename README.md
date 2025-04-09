@@ -9,11 +9,10 @@
 
 ## Opis zadatka
 
-* Sustav demonstrira upravljanje potrošnjom energije mikrokontrolera korištenjem Sleep moda. Projekt se sastoji od jednostavne Arduino aplikacije koja uključuje LED diodu i tipkalo. U aktivnoj fazi LED dioda svijetli određeno vrijeme, nakon čega mikrokontroler prelazi u sleep mod. Mikrokontroler se zatim budi putem:
+Sustav demonstrira upravljanje potrošnjom energije mikrokontrolera korištenjem Sleep moda. Projekt se sastoji od jednostavne Arduino aplikacije koja uključuje LED diodu i tipkalo. U aktivnoj fazi LED dioda svijetli određeno vrijeme, nakon čega mikrokontroler prelazi u sleep mod. Mikrokontroler se zatim budi putem:
 
-** Prekida izazvanog pritiskom na tipkalo
-
-** Watchdog timera (WDT) nakon određenog vremena
+* Prekida izazvanog pritiskom na tipkalo
+* Watchdog timera (WDT) nakon određenog vremena
 
 Nakon buđenja, sustav ponovno ulazi u aktivnu fazu i ciklus se ponavlja.
 
@@ -47,11 +46,11 @@ Nakon buđenja, u serijskom monitoru se ispisuje poruka da je uređaj probuđen.
 Nakon buđenja, sustav ponovno ulazi u aktivni period, LED svijetli 5 sekundi, a zatim se ciklus ponavlja – mikrokontroler ponovno ulazi u sleep.
 
 ## Usporedba sleep modova
-| Sleep Mode     | Potrošnja energije | Što se isključuje?                        | Načini buđenja                      |
-| -------------- | ------------------ | ----------------------------------------- | ----------------------------------- |
-| **Idle**       | Najmanja ušteda    | CPU, Flash memorija, ALU                  | Timer, prekidi                      |
-| **Power-down** | Najveća ušteda     | Gotovo sve (osim WDT i eksternih prekida) | Eksterni prekid, WDT                |
-| **Standby**    | Velika ušteda      | Gotovo sve (osim WDT i eksternih prekida) | Eksterni prekid                     |
+| Sleep Mode     | Potrošnja energije | Načini buđenja                      |
+| -------------- | ------------------ | ----------------------------------- |
+| **Idle**       | Najmanja ušteda    | Timer, prekidi                      |
+| **Power-down** | Najveća ušteda     | Eksterni prekid, WDT                |
+| **Standby**    | Velika ušteda      | Eksterni prekid                     |
 
 ## Slika spoja
 ![zadatak2slika](https://github.com/user-attachments/assets/b3f3dfc5-6a5c-4c49-8294-cfe1adae2efc)
